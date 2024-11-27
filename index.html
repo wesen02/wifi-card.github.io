@@ -1,83 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Connect to Wi-Fi</title>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-    .container {
-      max-width: 500px;
-      margin: 0 auto;
-      padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-    }
-    input {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    #qrcode {
-      margin: 20px 0;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QR Code Generator</title>
+
+    <style>
+        body,
+        header {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
+
 <body>
-  <div class="container">
-    <h1>Wi-Fi QR Code Generator</h1>
-    <form id="wifi-form">
-      <label for="wifi-name">Wi-Fi Name (SSID):</label>
-      <input type="text" id="wifi-name" placeholder="Enter Wi-Fi Name" required>
-      
-      <label for="wifi-password">Wi-Fi Password:</label>
-      <input type="text" id="wifi-password" placeholder="Enter Wi-Fi Password" required>
-      
-      <label for="wifi-security">Wi-Fi Security:</label>
-      <select id="wifi-security" required>
-        <option value="WPA">WPA/WPA2</option>
-        <option value="WEP">WEP</option>
-        <option value="nopass">No Password</option>
-      </select>
+    <main>
+        <div id="qrcode"></div>
+        <button id="generate-btn">Generate QR Code</button>
+        <a id="download-btn" href="#" style="display:none;" download="wifi-qrcode.png">
+            <button>Download QR Code</button>
+        </a>
+    </main>
 
-      <button type="button" onclick="generateQRCode()">Generate QR Code</button>
-    </form>
-    <div id="qrcode"></div>
-  </div>
+    <script>
+        // Function to generate the QR code and make it downloadable
+        document.getElementById('generate-btn').onclick = function () {
+            const securityType = "WPA"; // Example security type
+            const ssid = "wskhoo_home"; // Example SSID
+            const password = "12345678"; // Example password
 
-  <script>
-    function generateQRCode() {
-      const ssid = document.getElementById("wifi-name").value;
-      const password = document.getElementById("wifi-password").value;
-      const security = document.getElementById("wifi-security").value;
+            // Construct the Wi-Fi QR code string
+            const qrCodeString = `WIFI:T:${securityType};S:${ssid};P:${password};H:;`;
 
-      if (!ssid) {
-        alert("Please enter the Wi-Fi name (SSID).");
-        return;
-      }
+            // Clear previous QR code (if any)
+            document.getElementById('qrcode').innerHTML = '';
 
-      // Generate the Wi-Fi QR code string
-      const qrCodeString = `WIFI:T:${security};S:${ssid};P:${password};H:;`;
+            // Generate the QR code
+            const qrcode = new QRCode("qrcode", {
+                text: qrCodeString,
+                width: 256,
+                height: 256,
+                correctLevel: QRCode.CorrectLevel.H
+            });
 
-      // Generate the QR code
-      const qrcodeElement = document.getElementById("qrcode");
-      qrcodeElement.innerHTML = ""; // Clear previous QR code
-      QRCode.toCanvas(qrcodeElement, qrCodeString, { width: 256 }, (error) => {
-        if (error) console.error(error);
-      });
-    }
-  </script>
+            // Get the canvas element and create a downloadable link
+            const canvas = document.querySelector("#qrcode canvas");
+            if (canvas) {
+                const dataURL = canvas.toDataURL("image/png");
+                const downloadLink = document.getElementById("download-btn");
+                downloadLink.href = dataURL;
+                downloadLink.style.display = "inline-block"; // Show the download button
+            }
+        };
+    </script>
 </body>
+
 </html>
