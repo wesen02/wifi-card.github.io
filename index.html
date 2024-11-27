@@ -1,96 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connect to Wi-Fi</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        input {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connect to Wi-Fi</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    #qrcode {
+      margin: 20px 0;
+    }
+  </style>
 </head>
-
 <body>
-    <div class="container">
-        <h1>Connect to Wi-Fi</h1>
-        <form id="wifi-form">
-            <label for="wifi-name">Wi-Fi Name (SSID):</label>
-            <input type="text" id="wifi-name" placeholder="Enter Wi-Fi Name" required>
+  <div class="container">
+    <h1>Wi-Fi QR Code Generator</h1>
+    <form id="wifi-form">
+      <label for="wifi-name">Wi-Fi Name (SSID):</label>
+      <input type="text" id="wifi-name" placeholder="Enter Wi-Fi Name" required>
+      
+      <label for="wifi-password">Wi-Fi Password:</label>
+      <input type="text" id="wifi-password" placeholder="Enter Wi-Fi Password" required>
+      
+      <label for="wifi-security">Wi-Fi Security:</label>
+      <select id="wifi-security" required>
+        <option value="WPA">WPA/WPA2</option>
+        <option value="WEP">WEP</option>
+        <option value="nopass">No Password</option>
+      </select>
 
-            <label for="wifi-password">Wi-Fi Password:</label>
-            <input type="text" id="wifi-password" placeholder="Enter Wi-Fi Password" required>
+      <button type="button" onclick="generateQRCode()">Generate QR Code</button>
+    </form>
+    <div id="qrcode"></div>
+  </div>
 
-            <label for="wifi-security">Wi-Fi Security:</label>
-            <select id="wifi-security" required>
-                <option value="WPA">WPA/WPA2</option>
-                <option value="WEP">WEP</option>
-                <option value="nopass">No Password</option>
-            </select>
+  <script>
+    function generateQRCode() {
+      const ssid = document.getElementById("wifi-name").value;
+      const password = document.getElementById("wifi-password").value;
+      const security = document.getElementById("wifi-security").value;
 
-            <button type="button" onclick="showWiFiDetails()">Connect</button>
-        </form>
-    </div>
+      if (!ssid) {
+        alert("Please enter the Wi-Fi name (SSID).");
+        return;
+      }
 
-    <script>
-        function showWiFiDetails() {
-            const ssid = document.getElementById("wifi-name").value;
-            const password = document.getElementById("wifi-password").value;
-            const security = document.getElementById("wifi-security").value;
+      // Generate the Wi-Fi QR code string
+      const qrCodeString = `WIFI:T:${security};S:${ssid};P:${password};H:;`;
 
-            if (!ssid) {
-                alert("Please enter the Wi-Fi name (SSID).");
-                return;
-            }
-
-            // Alert Wi-Fi details
-            let message = `Connect to the following Wi-Fi network:\n\nSSID: ${ssid}\nSecurity: ${security}`;
-            if (security !== 'nopass') {
-                message += `\nPassword: ${password}`;
-            }
-            alert(message);
-
-            // Note: Direct connection is not supported through browsers due to security reasons.
-        }
-    </script>
+      // Generate the QR code
+      const qrcodeElement = document.getElementById("qrcode");
+      qrcodeElement.innerHTML = ""; // Clear previous QR code
+      QRCode.toCanvas(qrcodeElement, qrCodeString, { width: 256 }, (error) => {
+        if (error) console.error(error);
+      });
+    }
+  </script>
 </body>
-
 </html>
